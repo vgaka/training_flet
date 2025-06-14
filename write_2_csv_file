@@ -1,0 +1,41 @@
+from flet import *
+from datetime import datetime
+import csv
+# first program to write textbox value to CSV file
+
+def main(page : Page):
+    def read_csv_data(e):
+        with open('friend_data.csv', 'r', encoding='utf-8') as readerfile:
+            r = csv.reader(readerfile,delimiter=",")
+            rows = [" , ".join(row) for row in r]
+            display.value = "\n".join(rows)
+            textdebug.value = "Read CSV data"
+            page.update()
+
+    def writecsv(text):
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open('friend_data.csv', 'a',encoding='utf-8',newline='') as file:
+            fw = csv.writer(file)
+            fw.writerow([ts, text])
+        textdebug.value = f"Write CSV data : {text} at {ts}"
+        page.update()
+    
+    def showtext(e):
+        if name.value != '':
+            display.value = "สวัสดี "+name.value
+            writecsv(name.value)
+            textdebug.value = f"Submit name :{name.value} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            name.value = ''
+        else:
+            display.value = "กรุณาใส่ชื่อ" ; textdebug.value = "กรุณาใส่ชื่อก่อนกดปุ่ม"
+        page.update()
+
+    page.window.width = 400 ; page.window.height = 600 ; page.window.left = 500 ;page.window.top = 100
+    name = TextField(label='ใส่ชื่อตรงนี้')
+    textdebug= Text()
+    display = Text(size=20)
+    readcsv = ElevatedButton('ReadCsv', on_click=read_csv_data)
+    button_add = ElevatedButton("Ok and Add", on_click=showtext)
+    page.add( name, button_add ,textdebug, readcsv, display)
+
+app(target=main)
